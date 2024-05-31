@@ -7,3 +7,8 @@ else:
     print('CUDA is available!  Training on GPU ...')
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 print(device)
+
+trainDirectory = 'Data/train_set'
+testDirectory = 'Data/val_set'
+
+processedTrainDirectory = 'Data/processedData/processed_train_set'
