@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import torch
+from tqdm import tqdm
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
@@ -29,6 +30,8 @@ def process_images(input_dir, output_dir):
     image_path_pattern = os.path.join(input_dir, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
+    pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
+
     for image_path in image_paths:
         image = cv2.imread(image_path)
 
@@ -47,12 +50,17 @@ def process_images(input_dir, output_dir):
 
     # saving the images
         success = cv2.imwrite(processed_image_path, image)
-        if success:
-            print(f"Saved processed image to: {processed_image_path}")
-        else:
-            print(f"Failed to save image: {processed_image_path}")
+        # if success:
+        #     print(f"Saved processed image to: {processed_image_path}")
+        # else:
+        #     print(f"Failed to save image: {processed_image_path}")
 
+        pbar.update(1)
 
     # Process of the images in the train set and the test set
+
+print("Processing train set")
 process_images(trainDirectory, processedTrainDirectory)
+
+print("Processing test set")
 process_images(testDirectory, processedTestDirectory)
