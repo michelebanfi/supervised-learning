@@ -21,10 +21,12 @@ testDirectory = 'Data/val_set'
 
 processedTrainDirectory = 'Data/processedData/processed_train_set'
 processedTestDirectory = 'Data/processedData/processed_test_set'
+processedValDirectory = 'Data/processedData/processed_val_set'
 
 # Creation of the directory if they dont exist
 os.makedirs(processedTrainDirectory, exist_ok=True)
 os.makedirs(processedTestDirectory, exist_ok=True)
+os.makedirs(processedValDirectory, exist_ok=True)
 
 def process_images(input_dir, output_dir):
     image_path_pattern = os.path.join(input_dir, "*.jpg")
@@ -39,16 +41,14 @@ def process_images(input_dir, output_dir):
         if (len(image.shape) != 3):
             print("is not RGB")
 
-
-
         # Resize of the images to a common size
         image = cv2.resize(image, (256, 256))
 
-    # path to save the images
+        # path to save the images
         base_filename = os.path.basename(image_path)
         processed_image_path = os.path.join(output_dir, base_filename)
 
-    # saving the images
+        # saving the images
         success = cv2.imwrite(processed_image_path, image)
         # if success:
         #     print(f"Saved processed image to: {processed_image_path}")
@@ -59,8 +59,28 @@ def process_images(input_dir, output_dir):
 
     # Process of the images in the train set and the test set
 
-print("Processing train set")
-process_images(trainDirectory, processedTrainDirectory)
+# print("Processing train set")
+# process_images(trainDirectory, processedTrainDirectory)
 
-print("Processing test set")
-process_images(testDirectory, processedTestDirectory)
+# print("Processing test set")
+# process_images(testDirectory, processedTestDirectory)
+
+def valSet():
+    # take 3% of the train set and create a vaidation set
+    image_path_pattern = os.path.join(processedTrainDirectory, "*.jpg")
+    image_paths = glob.glob(image_path_pattern)
+
+    # 3% of the train set drawn randomly
+    val_set = np.random.choice(image_paths, int(len(image_paths)*0.03), replace=False)
+
+    # path to save the images
+    for image_path in val_set:
+        base_filename = os.path.basename(image_path)
+        processed_image_path = os.path.join(processedValDirectory, base_filename)
+
+        # move the images to the test set
+        os.rename(image_path, processed_image_path)
+
+# Creation of the validation set
+print("Creating validation set")
+valSet()

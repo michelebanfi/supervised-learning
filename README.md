@@ -15,7 +15,7 @@ git pull
 # Road map:  
 - [x] Data preprocessing: Process the images by resizing them to a common size,
 converting them to grayscale or RGB, and normalizing the pixel values. 
-- [ ] Create the validation test from the train test. 
+- [x] Create the validation test from the train test. 
 - [ ] Convolutional neural network: train a convolutional neural network on the preprocessed 
 images to classify them into different categories.
 - [ ] Cast the problem as self-supervised learning 
