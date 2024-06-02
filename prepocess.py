@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import torch
 from tqdm import tqdm
+import pandas as pd
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
@@ -28,17 +29,39 @@ os.makedirs(processedTrainDirectory, exist_ok=True)
 os.makedirs(processedTestDirectory, exist_ok=True)
 os.makedirs(processedValDirectory, exist_ok=True)
 
-def process_images(input_dir, output_dir):
+# load images classes from "train_info.csv"
+trainInfo = pd.read_csv('Data/annot/train_info.csv')
+testInfo = pd.read_csv('Data/annot/val_info.csv')
+
+trainClasses = trainInfo['class'].unique()
+testClasses = testInfo['class'].unique()
+
+# create folders for each train class
+for trainClass in trainClasses:
+    os.makedirs(os.path.join(processedTrainDirectory, str(trainClass)), exist_ok=True)
+
+# create folders for each test class
+for testClass in testClasses:
+    os.makedirs(os.path.join(processedTestDirectory, str(testClass)), exist_ok=True)
+
+# create folders for each validation class (using the train classes)
+for valClass in trainClasses:
+    os.makedirs(os.path.join(processedValDirectory, str(valClass)), exist_ok=True)
+
+def process_images(input_dir, output_dir, set_type):
     image_path_pattern = os.path.join(input_dir, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
-
-    # load images classes from "train_info.csv"
-
 
     pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
 
     for image_path in image_paths:
         image = cv2.imread(image_path)
+
+        # get image class
+        if set_type == "train":
+            imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
+        else:
+            imageClass = testInfo[testInfo['image'] == os.path.basename(image_path)]['class'].values[0]
 
         # Check if the image is in RBG format
         if (len(image.shape) != 3):
@@ -49,18 +72,12 @@ def process_images(input_dir, output_dir):
 
         # path to save the images
         base_filename = os.path.basename(image_path)
-        processed_image_path = os.path.join(output_dir, base_filename)
+        processed_image_path = os.path.join(output_dir, str(imageClass), base_filename)
 
         # saving the images
         cv2.imwrite(processed_image_path, image)
 
         pbar.update(1)
-
-# print("Processing train set")
-# process_images(trainDirectory, processedTrainDirectory)
-
-# print("Processing test set")
-# process_images(testDirectory, processedTestDirectory)
 
 def valSet():
     # take 3% of the train set and create a vaidation set
@@ -72,11 +89,21 @@ def valSet():
 
     # path to save the images
     for image_path in val_set:
+
+        # get image class from train set
+        imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
+
         base_filename = os.path.basename(image_path)
-        processed_image_path = os.path.join(processedValDirectory, base_filename)
+        processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
 
         # move the images to the test set
         os.rename(image_path, processed_image_path)
+
+print("Processing train set")
+process_images(trainDirectory, processedTrainDirectory, "train")
+
+print("Processing test set")
+process_images(testDirectory, processedTestDirectory, "test")
 
 # Creation of the validation set
 print("Creating validation set")
