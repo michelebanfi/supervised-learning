@@ -8,17 +8,23 @@ from tqdm import tqdm
 import pandas as pd
 
 train_on_gpu = torch.cuda.is_available()
-if not train_on_gpu:
-    print('CUDA is not available.  Training on CPU ...')
-else:
-    print('CUDA is available!  Training on GPU ...')
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
-print(device)
+print("running on:", device)
+
+
+# class list pre processing
+def add_string(file, string):
+    with open(file, 'r') as original: data = original.read()
+    if data.startswith(string): return
+    with open(file, 'w') as modified: modified.write(string + data)
+
+
+add_string('Data/annot/train_info.csv', 'class,image\n')
+add_string('Data/annot/val_info.csv', 'class,image\n')
 
 # Directory:
 trainDirectory = 'Data/train_set'
 testDirectory = 'Data/val_set'
-
 
 processedTrainDirectory = 'Data/processedData/processed_train_set'
 processedTestDirectory = 'Data/processedData/processed_test_set'
@@ -47,6 +53,7 @@ for testClass in testClasses:
 # create folders for each validation class (using the train classes)
 for valClass in trainClasses:
     os.makedirs(os.path.join(processedValDirectory, str(valClass)), exist_ok=True)
+
 
 def process_images(input_dir, output_dir, set_type):
     image_path_pattern = os.path.join(input_dir, "*.jpg")
@@ -79,17 +86,17 @@ def process_images(input_dir, output_dir, set_type):
 
         pbar.update(1)
 
+
 def valSet():
     # take 3% of the train set and create a vaidation set
     image_path_pattern = os.path.join(processedTrainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
     # 3% of the train set drawn randomly
-    val_set = np.random.choice(image_paths, int(len(image_paths)*0.03), replace=False)
+    val_set = np.random.choice(image_paths, int(len(image_paths) * 0.03), replace=False)
 
     # path to save the images
     for image_path in val_set:
-
         # get image class from train set
         imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
 
@@ -98,6 +105,7 @@ def valSet():
 
         # move the images to the test set
         os.rename(image_path, processed_image_path)
+
 
 print("Processing train set")
 process_images(trainDirectory, processedTrainDirectory, "train")
