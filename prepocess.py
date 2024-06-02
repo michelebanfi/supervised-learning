@@ -19,8 +19,8 @@ def add_string(file, string):
     with open(file, 'w') as modified: modified.write(string + data)
 
 
-add_string('Data/annot/train_info.csv', 'class,image\n')
-add_string('Data/annot/val_info.csv', 'class,image\n')
+add_string('Data/annot/train_info.csv', 'image,class\n')
+add_string('Data/annot/val_info.csv', 'image,class\n')
 
 # Directory:
 trainDirectory = 'Data/train_set'
@@ -89,22 +89,26 @@ def process_images(input_dir, output_dir, set_type):
 
 def valSet():
     # take 3% of the train set and create a vaidation set
-    image_path_pattern = os.path.join(processedTrainDirectory, "*.jpg")
+    image_path_pattern = os.path.join(trainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
     # 3% of the train set drawn randomly
     val_set = np.random.choice(image_paths, int(len(image_paths) * 0.03), replace=False)
 
+    pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
+
     # path to save the images
     for image_path in val_set:
-        # get image class from train set
-        imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
-
-        base_filename = os.path.basename(image_path)
-        processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
-
-        # move the images to the test set
-        os.rename(image_path, processed_image_path)
+        matching_rows = trainInfo[trainInfo['image'] == os.path.basename(image_path)]
+        if matching_rows.empty:
+            print(f"No matching rows for image: {os.path.basename(image_path)}")
+        else:
+            imageClass = matching_rows['class'].values[0]
+            base_filename = os.path.basename(image_path)
+            processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
+            # move the images to the test set
+            os.rename(image_path, processed_image_path)
+        pbar.update(1)
 
 
 print("Processing train set")

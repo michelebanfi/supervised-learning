@@ -16,8 +16,9 @@ git pull
 - [x] Data preprocessing: Process the images by resizing them to a common size,
 converting them to grayscale or RGB, and normalizing the pixel values. 
 - [x] Create the validation test from the train test. 
-- [ ] Convolutional neural network: train a convolutional neural network on the preprocessed 
+- [x] Convolutional neural network: train a convolutional neural network on the preprocessed 
 images to classify them into different categories.
+
 - [ ] Cast the problem as self-supervised learning 
 - [ ] Model evaluation: evaluate the performance of the models using metrics such
 as accuracy, precision, recall, and F1-score. 

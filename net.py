@@ -25,30 +25,30 @@ class Net(nn.Module):
 
         self.dropout = nn.Dropout(0.5)
 
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+        self.optimizer = torch.optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
         # Feature extraction
-        x = F.relu(self.conv1(x))
+        x = F.leaky_relu(self.conv1(x))
         x = self.pool1(x)
 
-        x = F.relu(self.conv2(x))
+        x = F.leaky_relu(self.conv2(x))
         x = self.pool2(x)
 
-        x = F.relu(self.conv3(x))
+        x = F.leaky_relu(self.conv3(x))
         x = self.pool3(x)
 
-        x = F.relu(self.conv4(x))
+        x = F.leaky_relu(self.conv4(x))
         x = self.pool4(x)
 
         # Flatten the tensor for the fully connected layers
         x = x.view(x.size(0), -1)
 
         # Classification
-        x = F.relu(self.fc1(x))
+        x = F.leaky_relu(self.fc1(x))
         x = self.dropout(x)
-        x = F.relu(self.fc2(x))
+        x = F.leaky_relu(self.fc2(x))
         x = self.dropout(x)
         x = self.fc3(x)
         return x
