@@ -6,20 +6,22 @@ class Net(nn.Module):
     def __init__(self, num_classes):
         super(Net, self).__init__()
         # Define the feature extraction part of the network
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.conv4 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv5 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.conv6 = nn.Conv2d(128, 128, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
+        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.conv4 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
+        self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         # Define the classification part of the network
-        self.fc1 = nn.Linear(128 * 32 * 32, 512)
-        self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, num_classes)
+        self.fc1 = nn.Linear(32 * 4 * 4, 256)  # Adjusted size due to pooling
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, num_classes)
 
         self.dropout = nn.Dropout(0.5)
 
@@ -29,19 +31,19 @@ class Net(nn.Module):
     def forward(self, x):
         # Feature extraction
         x = F.relu(self.conv1(x))
+        x = self.pool1(x)
+
         x = F.relu(self.conv2(x))
-        x = self.pool(x)
+        x = self.pool2(x)
 
         x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = self.pool(x)
+        x = self.pool3(x)
 
-        x = F.relu(self.conv5(x))
-        x = F.relu(self.conv6(x))
-        x = self.pool(x)
+        x = F.relu(self.conv4(x))
+        x = self.pool4(x)
 
         # Flatten the tensor for the fully connected layers
-        x = x.view(-1, 128 * 32 * 32)
+        x = x.view(x.size(0), -1)
 
         # Classification
         x = F.relu(self.fc1(x))

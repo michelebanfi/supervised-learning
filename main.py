@@ -12,7 +12,7 @@ def main():
     print("running on: ", device)
 
     net = Net(num_classes=251)
-    summary(net, (3, 256, 256))
+    summary(net, (3, 64, 64))
     net.to(device)
 
     lossOvertime = []
@@ -20,12 +20,15 @@ def main():
 
     # Define data transformations pipeline
     transforms = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor()
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Resize((64, 64))
     ])
 
     trainSet = torchvision.datasets.ImageFolder(root='./Data/processedData/processed_train_set', transform=transforms)
+    testSet = torchvision.datasets.ImageFolder(root='./Data/processedData/processed_test_set', transform=transforms)
 
     trainLoader = DataLoader(trainSet, batch_size=64, shuffle=True, num_workers=2)
+    testLoader = DataLoader(testSet, batch_size=64, shuffle=True, num_workers=2)
 
     epochs = 1
 
@@ -39,7 +42,23 @@ def main():
             running_loss += loss.item()
 
         lossOvertime.append(running_loss)
-        print(f"Epoch {epoch + 1}, loss: {running_loss}")
+
+
+        # check accuracy on test set
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for data in testLoader:
+                images, labels = data
+                images, labels = images.to(device), labels.to(device)
+                outputs = net(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        accuracyOvertime.append(accuracy)
+        print(f"Epoch {epoch + 1}, loss: {running_loss}, accuracy: {accuracy}")
 
         # save model
         torch.save(net.state_dict(), f"model_{epoch}.pth")
