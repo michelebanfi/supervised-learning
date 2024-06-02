@@ -92,31 +92,44 @@ def valSet():
     image_path_pattern = os.path.join(trainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
-    # 3% of the train set drawn randomly
-    val_set = np.random.choice(image_paths, int(len(image_paths) * 0.03), replace=False)
+    # for the validation set, draw 3% of the train set. But be sure that at least one image of each class is in the validation set
+    val_set = []
+    for trainClass in trainClasses:
+        matching_rows = trainInfo[trainInfo['class'] == trainClass]
+        image = matching_rows['image'].values[0]
+        image_path = os.path.join(trainDirectory, image)
+        val_set.append(image_path)
 
-    pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
+    # draw the rest of the images
+    rand_choice = np.random.choice(image_paths, int(len(image_paths) * 0.03) - len(val_set), replace=False)
+    val_set.extend(rand_choice)
+
+    pbar = tqdm(total=len(val_set), desc='Processing', unit='frame')
 
     # path to save the images
     for image_path in val_set:
         matching_rows = trainInfo[trainInfo['image'] == os.path.basename(image_path)]
-        if matching_rows.empty:
-            print(f"No matching rows for image: {os.path.basename(image_path)}")
-        else:
-            imageClass = matching_rows['class'].values[0]
-            base_filename = os.path.basename(image_path)
-            processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
-            # move the images to the test set
-            os.rename(image_path, processed_image_path)
+
+        imageClass = matching_rows['class'].values[0]
+        base_filename = os.path.basename(image_path)
+        image = cv2.imread(image_path)
+        # check if image is not None
+        if image is None:
+            continue
+        image = cv2.resize(image, (256, 256))
+        # save the image in the original place
+        cv2.imwrite(image_path, image)
+        processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
+        # move the images to the test set
+        os.rename(image_path, processed_image_path)
         pbar.update(1)
 
+# Creation of the validation set
+print("Creating validation set and processing it")
+valSet()
 
 print("Processing train set")
 process_images(trainDirectory, processedTrainDirectory, "train")
 
 print("Processing test set")
 process_images(testDirectory, processedTestDirectory, "test")
-
-# Creation of the validation set
-print("Creating validation set")
-valSet()
