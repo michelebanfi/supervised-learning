@@ -69,11 +69,13 @@ def main():
     print(lossOvertime)
     print(accuracyOvertime)
 
-    # plot loss and accuracy in the same graph
-    plt.plot(lossOvertime, label='loss')
-    plt.plot(accuracyOvertime, label='accuracy')
-    plt.legend()
-    plt.savefig('Media/loss_accuracy.png')
+    # plot loss and accuracy in separate graphs
+    plt.plot(lossOvertime)
+    plt.savefig('Media/loss.png')
+    plt.close()
+
+    plt.plot(accuracyOvertime)
+    plt.savefig('Media/accuracy.png')
     plt.close()
 
     print("Starting validation")
