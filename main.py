@@ -32,11 +32,11 @@ def main():
     for epoch in range(epochs):
         running_loss = 0.0
 
-        for i, data in tqdm(enumerate(trainLoader), total=len(trainLoader)):
+        for i, data in tqdm(enumerate(trainLoader, 0), total=len(trainLoader)):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device)
             loss = net.trainStep(inputs, labels)
-            running_loss += loss
+            running_loss += loss.item()
 
         lossOvertime.append(running_loss)
         print(f"Epoch {epoch + 1}, loss: {running_loss}")
