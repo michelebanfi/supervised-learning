@@ -18,8 +18,16 @@ class Net(nn.Module):
         self.conv4 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        # Calculate the size of the input to the first fully connected layer
+        # Input image size is (128, 128)
+        # After first pooling: (128/2) = 64
+        # After second pooling: (64/2) = 32
+        # After third pooling: (32/2) = 16
+        # After fourth pooling: (16/2) = 8
+        fc1_input_size = 32 * 8 * 8
+
         # Define the classification part of the network
-        self.fc1 = nn.Linear(32 * 4 * 4, 256)  # Adjusted size due to pooling
+        self.fc1 = nn.Linear(fc1_input_size, 256)
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, num_classes)
 
@@ -30,25 +38,25 @@ class Net(nn.Module):
 
     def forward(self, x):
         # Feature extraction
-        x = F.leaky_relu(self.conv1(x))
+        x = F.relu(self.conv1(x))
         x = self.pool1(x)
 
-        x = F.leaky_relu(self.conv2(x))
+        x = F.relu(self.conv2(x))
         x = self.pool2(x)
 
-        x = F.leaky_relu(self.conv3(x))
+        x = F.relu(self.conv3(x))
         x = self.pool3(x)
 
-        x = F.leaky_relu(self.conv4(x))
+        x = F.relu(self.conv4(x))
         x = self.pool4(x)
 
         # Flatten the tensor for the fully connected layers
         x = x.view(x.size(0), -1)
 
         # Classification
-        x = F.leaky_relu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         x = self.dropout(x)
-        x = F.leaky_relu(self.fc2(x))
+        x = F.relu(self.fc2(x))
         x = self.dropout(x)
         x = self.fc3(x)
         return x

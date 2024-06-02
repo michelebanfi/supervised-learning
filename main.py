@@ -12,8 +12,10 @@ def main():
     device = torch.device("cuda:0" if train_on_gpu else "cpu")
     print("running on: ", device)
 
+    size = 128
+
     net = Net(num_classes=251)
-    summary(net, (3, 64, 64))
+    summary(net, (3, size, size))
     net.to(device)
 
     lossOvertime = []
@@ -22,7 +24,7 @@ def main():
     # Define data transformations pipeline
     transforms = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
-        torchvision.transforms.Resize((64, 64))
+        torchvision.transforms.Resize((size, size))
     ])
 
     trainSet = torchvision.datasets.ImageFolder(root='./Data/processedData/processed_train_set', transform=transforms)
@@ -63,7 +65,7 @@ def main():
         print(f"Epoch {epoch + 1}, loss: {running_loss}, accuracy: {accuracy}")
 
         # save model
-        torch.save(net.state_dict(), f"Models/model_{epoch}.pth")
+        torch.save(net.state_dict(), f"Models/{size}- model_{epoch}.pth")
 
     print('Finished Training')
     print(lossOvertime)
