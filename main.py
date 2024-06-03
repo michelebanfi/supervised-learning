@@ -35,7 +35,7 @@ def main():
     testLoader = DataLoader(testSet, batch_size=64, shuffle=True, num_workers=2)
     valLoader = DataLoader(valSet, batch_size=64, shuffle=True, num_workers=2)
 
-    epochs = 5
+    epochs = 3
 
     for epoch in range(epochs):
         running_loss = 0.0

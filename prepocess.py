@@ -72,6 +72,12 @@ def process_images(input_dir, output_dir, set_type):
         base_filename = os.path.basename(image_path)
         processed_image_path = os.path.join(output_dir, str(imageClass), base_filename)
 
+        # move the image to the processed_image_path
+        try:
+            os.rename(image_path, processed_image_path)
+        except:
+            print("Error moving the image")
+
         pbar.update(1)
 
 
