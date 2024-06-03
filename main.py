@@ -1,13 +1,13 @@
 import torch
 import torchvision.datasets
 from net import Net
-#from torchsummary import summary
+from torchsummary import summary
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from sklearn.metrics import f1_score
 
-def main():
+def main(loadPreTrained: bool):
     train_on_gpu = torch.cuda.is_available()
     device = torch.device("cuda:0" if train_on_gpu else "cpu")
     print("running on: ", device)
@@ -23,7 +23,14 @@ def main():
     mean = [0.4914, 0.4822, 0.4465]
     std = [0.2023, 0.1994, 0.2010]
     net = Net(num_classes=251)
-    #summary(net, (3, size, size))
+    summary(net, (3, size, size))
+
+    # load a .pth file into the model in order to start from a pre-trained model
+    if loadPreTrained:
+        net.load_state_dict(torch.load('Models/128- model_2.pth'))
+        net.eval()
+
+
     net.to(device)
 
     lossOvertime = []
@@ -73,8 +80,12 @@ def main():
         accuracyOvertime.append(accuracy)
         print(f"Epoch {epoch + 1}, loss: {running_loss}, accuracy: {accuracy}")
 
+        title = ""
+        if loadPreTrained:
+            title = "-Pre-trained model"
+
         # save model
-        torch.save(net.state_dict(), f"Models/{size}- model_{epoch}.pth")
+        torch.save(net.state_dict(), f"Models/{size}-model_{epoch}{title}.pth")
 
     print('Finished Training')
     print(lossOvertime)
@@ -124,4 +135,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    loadPreTrained = True
+
+    main(loadPreTrained)

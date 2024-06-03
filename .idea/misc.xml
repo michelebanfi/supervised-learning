@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="superv" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Pytorch" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="supervised" project-jdk-type="Python SDK" />
 </project>
