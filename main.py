@@ -1,7 +1,7 @@
 import torch
 import torchvision.datasets
 from net import Net
-from torchsummary import summary
+#from torchsummary import summary
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -12,10 +12,17 @@ def main():
     device = torch.device("cuda:0" if train_on_gpu else "cpu")
     print("running on: ", device)
 
+    if torch.backends.mps.is_available():
+        mps_device = torch.device("mps")
+        x = torch.ones(1, device=mps_device)
+        print(x)
+    else:
+        print("MPS device not found.")
+
     size = 128
 
     net = Net(num_classes=251)
-    summary(net, (3, size, size))
+    #summary(net, (3, size, size))
     net.to(device)
 
     lossOvertime = []

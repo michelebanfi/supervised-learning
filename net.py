@@ -33,7 +33,7 @@ class Net(nn.Module):
 
         self.dropout = nn.Dropout(0.5)
 
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
