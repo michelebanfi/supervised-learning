@@ -20,7 +20,8 @@ def main():
         print("MPS device not found.")
 
     size = 128
-
+    mean = [0.4914, 0.4822, 0.4465]
+    std = [0.2023, 0.1994, 0.2010]
     net = Net(num_classes=251)
     #summary(net, (3, size, size))
     net.to(device)
@@ -31,7 +32,8 @@ def main():
     # Define data transformations pipeline
     transforms = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
-        torchvision.transforms.Resize((size, size))
+        torchvision.transforms.Resize((size, size)),
+        torchvision.transforms.Normalize(mean=mean, std=std)
     ])
 
     trainSet = torchvision.datasets.ImageFolder(root='./Data/processedData/processed_train_set', transform=transforms)
