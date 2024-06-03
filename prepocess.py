@@ -62,27 +62,15 @@ def process_images(input_dir, output_dir, set_type):
     pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
 
     for image_path in image_paths:
-        image = cv2.imread(image_path)
-
         # get image class
         if set_type == "train":
             imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
         else:
             imageClass = testInfo[testInfo['image'] == os.path.basename(image_path)]['class'].values[0]
 
-        # Check if the image is in RBG format
-        if (len(image.shape) != 3):
-            print("is not RGB")
-
-        # Resize of the images to a common size
-        image = cv2.resize(image, (256, 256))
-
         # path to save the images
         base_filename = os.path.basename(image_path)
         processed_image_path = os.path.join(output_dir, str(imageClass), base_filename)
-
-        # saving the images
-        cv2.imwrite(processed_image_path, image)
 
         pbar.update(1)
 
@@ -112,16 +100,13 @@ def valSet():
 
         imageClass = matching_rows['class'].values[0]
         base_filename = os.path.basename(image_path)
-        image = cv2.imread(image_path)
-        # check if image is not None
-        if image is None:
-            continue
-        image = cv2.resize(image, (256, 256))
-        # save the image in the original place
-        cv2.imwrite(image_path, image)
+
         processed_image_path = os.path.join(processedValDirectory, str(imageClass), base_filename)
-        # move the images to the test set
-        os.rename(image_path, processed_image_path)
+        try:
+            # move the images to the test set
+            os.rename(image_path, processed_image_path)
+        except:
+            print("Error moving the image")
         pbar.update(1)
 
 # Creation of the validation set
