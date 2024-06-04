@@ -3,20 +3,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Net(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, size):
         super(Net, self).__init__()
         # Define the feature extraction part of the network
         self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        size /= 2
 
         self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        size /= 2
 
         self.conv3 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+        size /= 2
 
         self.conv4 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
+        size /= 2
 
         # Calculate the size of the input to the first fully connected layer
         # Input image size is (128, 128)
@@ -24,7 +28,11 @@ class Net(nn.Module):
         # After second pooling: (64/2) = 32
         # After third pooling: (32/2) = 16
         # After fourth pooling: (16/2) = 8
-        fc1_input_size = 32 * 8 * 8
+
+        # cast size to int
+        size = int(size)
+
+        fc1_input_size = 32 * size * size
 
         # Define the classification part of the network
         self.fc1 = nn.Linear(fc1_input_size, 256)
