@@ -22,7 +22,7 @@ def main(loadPreTrained: bool):
     size = 128
     mean = [0.4914, 0.4822, 0.4465]
     std = [0.2023, 0.1994, 0.2010]
-    net = Net(num_classes=251)
+    net = Net(num_classes=251, size=size)
     summary(net, (3, size, size))
 
     # load a .pth file into the model in order to start from a pre-trained model
@@ -135,6 +135,6 @@ def main(loadPreTrained: bool):
 
 
 if __name__ == '__main__':
-    loadPreTrained = True
+    loadPreTrained = False
 
     main(loadPreTrained)
