@@ -20,8 +20,8 @@ def main(loadPreTrained: bool):
         print("MPS device not found.")
 
     size = 128
-    mean = [0.5, 0.5, 0.5]
-    std = [0.5, 0.5, 0.5]
+    mean = [0.6385, 0.5444, 0.4450]
+    std = [0.2262, 0.2446, 0.2658]
     net = Net(num_classes=251, size=size)
     summary(net, (3, size, size))
 
@@ -51,7 +51,7 @@ def main(loadPreTrained: bool):
     testLoader = DataLoader(testSet, batch_size=64, shuffle=True, num_workers=2)
     valLoader = DataLoader(valSet, batch_size=64, shuffle=True, num_workers=2)
 
-    epochs = 3
+    epochs = 5
 
     for epoch in range(epochs):
         running_loss = 0.0

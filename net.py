@@ -94,7 +94,7 @@ class Net(nn.Module):
         target = torch.zeros((y.size(0), 251))
         target[range(y.size(0)), y] = 1
 
-        loss = self.criterion(out, target)
+        loss = self.criterion(out, y)
 
         loss.backward()
         self.optimizer.step()
