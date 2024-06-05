@@ -20,8 +20,8 @@ def main(loadPreTrained: bool):
         print("MPS device not found.")
 
     size = 128
-    mean = [0.4914, 0.4822, 0.4465]
-    std = [0.2023, 0.1994, 0.2010]
+    mean = [0.5, 0.5, 0.5]
+    std = [0.5, 0.5, 0.5]
     net = Net(num_classes=251, size=size)
     summary(net, (3, size, size))
 
@@ -62,13 +62,13 @@ def main(loadPreTrained: bool):
             loss = net.trainStep(inputs, labels)
             running_loss += loss.item()
 
-        lossOvertime.append(running_loss)
+        lossOvertime.append(round(running_loss/len(trainLoader), 2))
 
-        # check accuracy on test set
+        # check accuracy on val set
         correct = 0
         total = 0
         with torch.no_grad():
-            for data in tqdm(testLoader):
+            for data in tqdm(valLoader, total=len(valLoader)):
                 images, labels = data
                 images, labels = images.to(device), labels.to(device)
                 outputs = net(images)
@@ -77,8 +77,9 @@ def main(loadPreTrained: bool):
                 correct += (predicted == labels).sum().item()
 
         accuracy = correct / total
+        accuracy = round(accuracy, 2)
         accuracyOvertime.append(accuracy)
-        print(f"Epoch {epoch + 1}, loss: {running_loss}, accuracy: {accuracy}")
+        print(f"Epoch {epoch + 1}, loss: {round(running_loss/len(trainLoader), 2)}, accuracy: {accuracy}")
 
         title = ""
         if loadPreTrained:
@@ -100,12 +101,13 @@ def main(loadPreTrained: bool):
     plt.savefig('Media/accuracy.png')
     plt.close()
 
-    print("Starting validation")
-    # validate the model on the validation set
+    print("Starting testing")
+
+    # validate the model on the test set
     correct = 0
     total = 0
     with torch.no_grad():
-        for data in valLoader:
+        for data in testLoader:
             images, labels = data
             images, labels = images.to(device), labels.to(device)
             outputs = net(images)
