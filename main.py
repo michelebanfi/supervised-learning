@@ -50,6 +50,10 @@ def main(loadPreTrained: bool):
     testLoader = DataLoader(testSet, batch_size=64, shuffle=True, num_workers=2)
     valLoader = DataLoader(valSet, batch_size=64, shuffle=True, num_workers=2)
 
+    print("Validation:", len(valLoader.dataset))
+    print("Training:", len(trainLoader.dataset))
+    print("Test:", len(testLoader.dataset))
+
     epochs = 5
 
     for epoch in range(epochs):
@@ -115,7 +119,7 @@ def main(loadPreTrained: bool):
             correct += (predicted == labels).sum().item()
 
     accuracy = correct / total
-    print(f"Validation accuracy: {accuracy}")
+    print(f"Testings accuracy: {accuracy}")
 
     # calculate the F1 score
     print("Starting F1 score calculation")
