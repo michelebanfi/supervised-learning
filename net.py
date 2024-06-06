@@ -13,7 +13,7 @@ class Net(nn.Module):
         paddings = [1, 1, 1, 1, 1, 1, 1]
         poolingsStride = [2, 0, 2, 0, 2, 0, 2]
         poolingsKernels = [2, 0, 2, 0, 2, 0, 2]
-        filters = [8, 16, 16, 32, 32, 64, 64]
+        filters = [8, 16, 16, 32, 64, 64, 128]
 
         super(Net, self).__init__()
         # Define the feature extraction part of the network
