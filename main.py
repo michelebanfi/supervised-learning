@@ -30,7 +30,6 @@ def main(loadPreTrained: bool):
         net.load_state_dict(torch.load('Models/128- model_2.pth'))
         net.eval()
 
-
     net.to(device)
 
     lossOvertime = []
