@@ -20,8 +20,8 @@ def main(loadPreTrained: bool):
         print("MPS device not found.")
 
     size = 128
-    mean = [0.6385, 0.5444, 0.4450]
-    std = [0.2262, 0.2446, 0.2658]
+    mean = [0.6388, 0.5446, 0.4452]
+    std = [0.2252, 0.2437, 0.2661]
     net = Net(num_classes=251, size=size)
     summary(net, (3, size, size))
 
@@ -86,7 +86,7 @@ def main(loadPreTrained: bool):
             title = "-Pre-trained model"
 
         # save model
-        torch.save(net.state_dict(), f"Models/{size}-model_{epoch}{title}.pth")
+        torch.save(net.state_dict(), f"Models/{size}-model_{epoch}{title}_corrected.pth")
 
     print('Finished Training')
     print(lossOvertime)

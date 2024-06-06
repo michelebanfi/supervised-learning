@@ -11,7 +11,6 @@ train_on_gpu = torch.cuda.is_available()
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 print("running on:", device)
 
-
 # class list pre processing
 def add_string(file, string):
     with open(file, 'r') as original: data = original.read()
@@ -42,6 +41,7 @@ testInfo = pd.read_csv('Data/annot/val_info.csv')
 trainClasses = trainInfo['class'].unique()
 testClasses = testInfo['class'].unique()
 
+print("creating class folders")
 # create folders for each train class
 for trainClass in trainClasses:
     os.makedirs(os.path.join(processedTrainDirectory, str(trainClass)), exist_ok=True)
@@ -53,7 +53,6 @@ for testClass in testClasses:
 # create folders for each validation class (using the train classes)
 for valClass in trainClasses:
     os.makedirs(os.path.join(processedValDirectory, str(valClass)), exist_ok=True)
-
 
 def process_images(input_dir, output_dir, set_type):
     image_path_pattern = os.path.join(input_dir, "*.jpg")
@@ -82,11 +81,11 @@ def process_images(input_dir, output_dir, set_type):
 
 
 def valSet():
-    # take 3% of the train set and create a vaidation set
+    # take 25% of the train set and create a vaidation set
     image_path_pattern = os.path.join(trainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
-    # for the validation set, draw 3% of the train set. But be sure that at least one image of each class is in the validation set
+    # for the validation set, draw 25% of the train set. But be sure that at least one image of each class is in the validation set
     val_set = []
     for trainClass in trainClasses:
         matching_rows = trainInfo[trainInfo['class'] == trainClass]
@@ -95,7 +94,7 @@ def valSet():
         val_set.append(image_path)
 
     # draw the rest of the images
-    rand_choice = np.random.choice(image_paths, int(len(image_paths) * 0.03) - len(val_set), replace=False)
+    rand_choice = np.random.choice(image_paths, int(len(image_paths) * 0.25) - len(val_set), replace=False)
     val_set.extend(rand_choice)
 
     pbar = tqdm(total=len(val_set), desc='Processing', unit='frame')
@@ -117,10 +116,66 @@ def valSet():
 
 # Creation of the validation set
 print("Creating validation set and processing it")
-valSet()
+#valSet()
 
 print("Processing train set")
-process_images(trainDirectory, processedTrainDirectory, "train")
+#process_images(trainDirectory, processedTrainDirectory, "train")
 
 print("Processing test set")
-process_images(testDirectory, processedTestDirectory, "test")
+#process_images(testDirectory, processedTestDirectory, "test")
+
+
+# Function to augment the data
+
+def augment_data(input_dir, output_dir, set_type, imageClass):
+    image_path_pattern = os.path.join(input_dir, str(imageClass), "*.jpg")
+    image_paths = glob.glob(image_path_pattern)
+
+    pbar = tqdm(total=len(image_paths), desc='Augmenting', unit='frame')
+
+    for image_path in image_paths:
+        image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        base_filename = os.path.basename(image_path)
+
+        # flip the image
+        flipped_image = cv2.flip(image, 1)
+        flipped_image_path = os.path.join(output_dir, str(imageClass), 'flipped_' + base_filename)
+        cv2.imwrite(flipped_image_path, cv2.cvtColor(flipped_image, cv2.COLOR_RGB2BGR))
+
+        # rotate the image
+        rows, cols, _ = image.shape
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 45, 1)
+        rotated_image = cv2.warpAffine(image, M, (cols, rows))
+        rotated_image_path = os.path.join(output_dir, str(imageClass), 'rotated_' + base_filename)
+        cv2.imwrite(rotated_image_path, cv2.cvtColor(rotated_image, cv2.COLOR_RGB2BGR))
+
+        # blur the image
+        blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
+        blurred_image_path = os.path.join(output_dir, str(imageClass), 'blurred_' + base_filename)
+        cv2.imwrite(blurred_image_path, cv2.cvtColor(blurred_image, cv2.COLOR_RGB2BGR))
+
+        pbar.update(1)
+
+print("Augmenting train set")
+# augment only those classes that have less than 100 images
+for trainClass in trainClasses:
+    matching_rows = trainInfo[trainInfo['class'] == trainClass]
+    if len(matching_rows) < 100:
+        augment_data(processedTrainDirectory, processedTrainDirectory, "train", trainClass)
+
+print("Augmenting test set")
+# augment only those classes that have less than 100 images
+for testClass in testClasses:
+    matching_rows = testInfo[testInfo['class'] == testClass]
+    if len(matching_rows) < 100:
+        augment_data(processedTestDirectory, processedTestDirectory, "test", testClass)
+
+print("Augmenting validation set")
+# augment only those classes that have less than 100 images
+for valClass in trainClasses:
+    matching_rows = trainInfo[trainInfo['class'] == valClass]
+    if len(matching_rows) < 100:
+        augment_data(processedValDirectory, processedValDirectory, "val", valClass)
+
+print("Done")
