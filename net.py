@@ -3,16 +3,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
+
 class Net(nn.Module):
     def __init__(self, num_classes, size):
 
         # list of the conv layers parameters
-        convLayerNumber = 5
-        kernels = [7, 5, 5, 3, 3]
-        paddings = [1, 1, 1, 1, 1]
-        poolingsStride = [2, 2, 2, 2, 2]
-        poolingsKernels = [2, 2, 2, 2, 2]
-        filters = [2, 4, 8, 16, 32]
+        convLayerNumber = 7
+        kernels = [11, 7, 7, 5, 5, 3, 3]
+        paddings = [1, 1, 1, 1, 1, 1, 1]
+        poolingsStride = [2, 0, 2, 0, 2, 0, 2]
+        poolingsKernels = [2, 0, 2, 0, 2, 0, 2]
+        filters = [8, 16, 16, 32, 32, 64, 64]
 
         super(Net, self).__init__()
         # Define the feature extraction part of the network
@@ -20,24 +21,24 @@ class Net(nn.Module):
         self.pool1 = nn.MaxPool2d(kernel_size=poolingsKernels[0], stride=poolingsStride[0])
 
         self.conv2 = nn.Conv2d(filters[0], filters[1], kernel_size=kernels[1], padding=paddings[1])
-        self.pool2 = nn.MaxPool2d(kernel_size=poolingsKernels[1], stride=poolingsStride[1])
-
         self.conv3 = nn.Conv2d(filters[1], filters[2], kernel_size=kernels[2], padding=paddings[2])
-        self.pool3 = nn.MaxPool2d(kernel_size=poolingsKernels[2], stride=poolingsStride[2])
+        self.pool2 = nn.MaxPool2d(kernel_size=poolingsKernels[2], stride=poolingsStride[2])
 
         self.conv4 = nn.Conv2d(filters[2], filters[3], kernel_size=kernels[3], padding=paddings[3])
-        self.pool4 = nn.MaxPool2d(kernel_size=poolingsKernels[3], stride=poolingsStride[3])
-
         self.conv5 = nn.Conv2d(filters[3], filters[4], kernel_size=kernels[4], padding=paddings[4])
-        self.pool5 = nn.MaxPool2d(kernel_size=poolingsKernels[4], stride=poolingsStride[4])
+        self.pool3 = nn.MaxPool2d(kernel_size=poolingsKernels[4], stride=poolingsStride[4])
 
-        # now i want to calculate the final dimension of all the conv layers
+        self.conv6 = nn.Conv2d(filters[4], filters[5], kernel_size=kernels[5], padding=paddings[5])
+        self.conv7 = nn.Conv2d(filters[5], filters[6], kernel_size=kernels[6], padding=paddings[6])
+        self.pool4 = nn.MaxPool2d(kernel_size=poolingsKernels[6], stride=poolingsStride[6])
+
+        # now we want to calculate the final dimension of all the conv layers
         for i in range(convLayerNumber):
             size = (size - kernels[i] + 2 * paddings[i]) / 1 + 1
-            if(poolingsKernels[i] != 0):
+            if (poolingsKernels[i] != 0):
                 size = int((size - poolingsKernels[i]) / poolingsStride[i] + 1)
 
-        fc1_input_size = filters[4] * size * size
+        fc1_input_size = filters[6] * size * size
 
         print("First layer size: ", fc1_input_size)
 
@@ -56,16 +57,16 @@ class Net(nn.Module):
         x = self.pool1(x)
 
         x = F.leaky_relu(self.conv2(x))
+        x = F.leaky_relu(self.conv3(x))
         x = self.pool2(x)
 
-        x = F.leaky_relu(self.conv3(x))
+        x = F.leaky_relu(self.conv4(x))
+        x = F.leaky_relu(self.conv5(x))
         x = self.pool3(x)
 
-        x = F.leaky_relu(self.conv4(x))
+        x = F.leaky_relu(self.conv6(x))
+        x = F.leaky_relu(self.conv7(x))
         x = self.pool4(x)
-
-        x = F.leaky_relu(self.conv5(x))
-        x = self.pool5(x)
 
         # Flatten the tensor for the fully connected layers
         x = x.view(x.size(0), -1)
