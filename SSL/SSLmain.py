@@ -162,9 +162,9 @@ rotation_datasetTest = RotationDataset(testSet)
 rotation_datasetVal = RotationDataset(valSet)
 
 batch_size = 64
-rotation_loader = DataLoader(rotation_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
-rotation_loaderTest = DataLoader(rotation_datasetTest, batch_size=batch_size, shuffle=True, num_workers=8)
-rotation_loaderVal = DataLoader(rotation_datasetTest, batch_size=batch_size, shuffle=True, num_workers=8)
+rotation_loader = DataLoader(rotation_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+rotation_loaderTest = DataLoader(rotation_datasetTest, batch_size=batch_size, shuffle=True, num_workers=4)
+rotation_loaderVal = DataLoader(rotation_datasetTest, batch_size=batch_size, shuffle=True, num_workers=4)
 
 print("Validation:", len(rotation_loader.dataset))
 print("Training:", len(rotation_loaderTest.dataset))
@@ -274,9 +274,9 @@ classification_dataset = datasets.ImageFolder(root="/kaggle/input/supervised/pro
 classification_datasetTest = datasets.ImageFolder(root="/kaggle/input/supervised/processedData/processed_test_set", transform=classification_transform)
 classification_datasetVal = datasets.ImageFolder(root="/kaggle/input/supervised/processedData/processed_val_set", transform=classification_transform)
 
-classification_loader = DataLoader(classification_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
-classification_loaderTest = DataLoader(classification_datasetTest, batch_size=batch_size, shuffle=True, num_workers=8)
-classification_loaderVal = DataLoader(classification_datasetVal, batch_size=batch_size, shuffle=True, num_workers=8)
+classification_loader = DataLoader(classification_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+classification_loaderTest = DataLoader(classification_datasetTest, batch_size=batch_size, shuffle=True, num_workers=4)
+classification_loaderVal = DataLoader(classification_datasetVal, batch_size=batch_size, shuffle=True, num_workers=4)
 
 # Fine-tune the SSL model for classification
 ssl_model.fc2 = nn.Linear(ssl_model.fc2.in_features, 251)  # Update the final layer for 251 classes
