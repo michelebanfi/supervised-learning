@@ -204,6 +204,9 @@ for epoch in range(num_epochs):
 
     lossOvertime.append(round(running_loss / len(rotation_loader), 2))
 
+    # put the model in evaluation mode
+    ssl_model.eval()
+
     # check accuracy on val set
     correct = 0
     total = 0
@@ -220,6 +223,9 @@ for epoch in range(num_epochs):
     accuracy = round(accuracy, 2)
     accuracyOvertime.append(accuracy)
     print(f"Epoch {epoch + 1}, loss: {round(running_loss / len(rotation_loader), 2)}, accuracy: {accuracy}")
+
+    # put the model back in training mode
+    ssl_model.train()
 
     # save the model after each epoch
     torch.save(ssl_model.state_dict(), f"ssl_model_epoch_{epoch + 1}.pth")
@@ -239,6 +245,9 @@ plt.close()
 
 # start testing
 print("Starting testing")
+
+# put the model in evaluation mode
+ssl_model.eval()
 
 # validate the model on the test set
 correct = 0
@@ -299,6 +308,9 @@ for epoch in range(num_epochs):
 
     lossOvertime.append(round(running_loss / len(classification_loader), 2))
 
+    # put the model in evaluation mode
+    ssl_model.eval()
+
     # check accuracy on val set
     correct = 0
     total = 0
@@ -315,6 +327,9 @@ for epoch in range(num_epochs):
     accuracy = round(accuracy, 2)
     accuracyOvertime.append(accuracy)
     print(f"Epoch {epoch + 1}, loss: {round(running_loss / len(classification_loader), 2)}, accuracy: {accuracy}")
+
+    # put the model back in training mode
+    ssl_model.train()
 
     # save the model after each epoch
     torch.save(ssl_model.state_dict(), f"ssl_model_classification_epoch_{epoch + 1}.pth")
@@ -334,6 +349,9 @@ plt.close()
 
 # start testing
 print("Starting testing")
+
+# put the model in evaluation mode
+ssl_model.eval()
 
 # validate the model on the test set
 correct = 0
