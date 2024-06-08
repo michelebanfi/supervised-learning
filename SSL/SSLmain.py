@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 from tqdm import tqdm
-# import torch.optim.lr_scheduler as lr_scheduler
+import torch.optim.lr_scheduler as lr_scheduler
 import matplotlib.pyplot as plt
 
 
@@ -59,10 +59,10 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(fc1_input_size, 256)
         self.fc2 = nn.Linear(256, num_classes)
 
-        self.dropout = nn.Dropout(0)
+        self.dropout = nn.Dropout(0.15)
 
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001)
-        self.criterion = nn.CrossEntropyLoss()
+        # self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001)
+        # self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
         # Feature extraction
@@ -184,6 +184,9 @@ ssl_model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(ssl_model.parameters(), lr=0.001)
 
+# define a learning rate scheduler
+scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0.0001)
+
 num_epochs = 1
 
 lossOvertime = []
@@ -200,6 +203,8 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
+
+    scheduler.step()
 
     lossOvertime.append(round(running_loss / len(rotation_loader), 2))
 
@@ -275,6 +280,9 @@ ssl_model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(ssl_model.parameters(), lr=0.001)
 
+# define a learning rate scheduler
+scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0.0001)
+
 num_epochs = 1
 lossOvertime = []
 accuracyOvertime = []
@@ -290,6 +298,8 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
+
+    scheduler.step()
 
     lossOvertime.append(round(running_loss / len(classification_loader), 2))
 
