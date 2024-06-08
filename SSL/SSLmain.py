@@ -10,10 +10,6 @@ import torch.optim.lr_scheduler as lr_scheduler
 import matplotlib.pyplot as plt
 
 
-# Ensure reproducibility
-torch.manual_seed(73)
-np.random.seed(73)
-
 mean = [0.6388, 0.5446, 0.4452]
 std = [0.2252, 0.2437, 0.2661]
 
@@ -187,7 +183,7 @@ optimizer = torch.optim.Adam(ssl_model.parameters(), lr=0.001)
 # define a learning rate scheduler
 scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0.0001)
 
-num_epochs = 1
+num_epochs = 10
 
 lossOvertime = []
 accuracyOvertime = []
@@ -283,7 +279,7 @@ optimizer = torch.optim.Adam(ssl_model.parameters(), lr=0.001)
 # define a learning rate scheduler
 scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0.0001)
 
-num_epochs = 1
+num_epochs = 10
 lossOvertime = []
 accuracyOvertime = []
 
