@@ -158,9 +158,9 @@ transform = transforms.Compose([
 ])
 
 
-trainSet = datasets.ImageFolder(root='kaggle/input/supervised/processed_train_set', transform=transforms)
-testSet = datasets.ImageFolder(root='kaggle/input/supervised/processed_test_set', transform=transforms)
-valSet = datasets.ImageFolder(root='kaggle/input/supervised/processed_val_set', transform=transforms)
+trainSet = datasets.ImageFolder(root='/kaggle/input/supervised/processedData/processed_train_set', transform=transform)
+testSet = datasets.ImageFolder(root='/kaggle/input/supervised/processedData/processed_test_set', transform=transform)
+valSet = datasets.ImageFolder(root='/kaggle/input/supervised/processedData/processed_val_set', transform=transform)
 rotation_dataset = RotationDataset(trainSet)
 rotation_datasetTest = RotationDataset(testSet)
 rotation_datasetVal = RotationDataset(valSet)
@@ -192,7 +192,7 @@ accuracyOvertime = []
 ssl_model.train()
 for epoch in range(num_epochs):
     running_loss = 0.0
-    for images, labels in tqdm(rotation_loader):
+    for images, labels in tqdm(rotation_loader, total=len(rotation_loader)):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = ssl_model(images, predict_rotation=True)
@@ -260,9 +260,9 @@ classification_transform = transforms.Compose([
     transforms.Normalize(mean=mean, std=std)
 ])
 
-classification_dataset = datasets.ImageFolder(root="kaggle/input/supervised/processed_train_set", transform=classification_transform)
-classification_datasetTest = datasets.ImageFolder(root="kaggle/input/supervised/processed_test_set", transform=classification_transform)
-classification_datasetVal = datasets.ImageFolder(root="kaggle/input/supervised/processed_val_set", transform=classification_transform)
+classification_dataset = datasets.ImageFolder(root="/kaggle/input/supervised/processedData/processed_train_set", transform=classification_transform)
+classification_datasetTest = datasets.ImageFolder(root="/kaggle/input/supervised/processedData/processed_test_set", transform=classification_transform)
+classification_datasetVal = datasets.ImageFolder(root="/kaggle/input/supervised/processedData/processed_val_set", transform=classification_transform)
 
 classification_loader = DataLoader(classification_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
 classification_loaderTest = DataLoader(classification_datasetTest, batch_size=batch_size, shuffle=True, num_workers=8)
