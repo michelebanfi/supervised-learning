@@ -44,7 +44,7 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(fc1_input_size, 256)
         self.fc2 = nn.Linear(256, num_classes)
 
-        self.dropout = nn.Dropout(0)
+        self.dropout = nn.Dropout(0.15)
 
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001)
         self.criterion = nn.CrossEntropyLoss()
