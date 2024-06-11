@@ -3,7 +3,6 @@ from torch.utils.data import Dataset
 import random
 import itertools
 
-
 class JigsawPuzzleDataset(Dataset):
     def __init__(self, dataset, grid_size=2):
         self.dataset = dataset
