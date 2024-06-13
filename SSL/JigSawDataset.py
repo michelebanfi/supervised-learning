@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 import random
 import itertools
+import matplotlib.pyplot as plt
 
 class JigsawPuzzleDataset(Dataset):
     def __init__(self, dataset, grid_size=2):
