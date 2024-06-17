@@ -10,7 +10,7 @@ train_on_gpu = torch.cuda.is_available()
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 print("running on:", device)
 
-# class list pre processing
+# class list pre-processing to correct the csv files
 def add_string(file, string):
     with open(file, 'r') as original: data = original.read()
     if data.startswith(string): return
@@ -41,6 +41,7 @@ trainClasses = trainInfo['class'].unique()
 testClasses = testInfo['class'].unique()
 
 print("creating class folders")
+
 # create folders for each train class
 for trainClass in trainClasses:
     os.makedirs(os.path.join(processedTrainDirectory, str(trainClass)), exist_ok=True)
@@ -60,6 +61,7 @@ def process_images(input_dir, output_dir, set_type):
     pbar = tqdm(total=len(image_paths), desc='Processing', unit='frame')
 
     for image_path in image_paths:
+
         # get image class
         if set_type == "train":
             imageClass = trainInfo[trainInfo['image'] == os.path.basename(image_path)]['class'].values[0]
@@ -80,11 +82,12 @@ def process_images(input_dir, output_dir, set_type):
 
 
 def valSet():
+
     # take 25% of the train set and create a vaidation set
     image_path_pattern = os.path.join(trainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
-    # for the validation set, draw 25% of the train set. But be sure that at least one image of each class is in the validation set
+    # for the validation set, draw 25% of the train set. Being sure that at least one image of each class is in the validation set
     val_set = []
     for trainClass in trainClasses:
         matching_rows = trainInfo[trainInfo['class'] == trainClass]
@@ -113,19 +116,18 @@ def valSet():
             print("Error moving the image")
         pbar.update(1)
 
-# Creation of the validation set
+
+# creation of the validation set before moving the images to the train set
 print("Creating validation set and processing it")
-#valSet()
+valSet()
 
 print("Processing train set")
-#process_images(trainDirectory, processedTrainDirectory, "train")
+process_images(trainDirectory, processedTrainDirectory, "train")
 
 print("Processing test set")
-#process_images(testDirectory, processedTestDirectory, "test")
+process_images(testDirectory, processedTestDirectory, "test")
 
-
-# Function to augment the data
-
+# function to augment the data
 def augment_data(input_dir, output_dir, set_type, imageClass):
     image_path_pattern = os.path.join(input_dir, str(imageClass), "*.jpg")
     image_paths = glob.glob(image_path_pattern)
@@ -156,7 +158,9 @@ def augment_data(input_dir, output_dir, set_type, imageClass):
 
         pbar.update(1)
 
+
 print("Augmenting train set")
+
 # augment only those classes that have less than 100 images
 for trainClass in trainClasses:
     matching_rows = trainInfo[trainInfo['class'] == trainClass]
@@ -164,6 +168,7 @@ for trainClass in trainClasses:
         augment_data(processedTrainDirectory, processedTrainDirectory, "train", trainClass)
 
 print("Augmenting test set")
+
 # augment only those classes that have less than 100 images
 for testClass in testClasses:
     matching_rows = testInfo[testInfo['class'] == testClass]
@@ -171,6 +176,7 @@ for testClass in testClasses:
         augment_data(processedTestDirectory, processedTestDirectory, "test", testClass)
 
 print("Augmenting validation set")
+
 # augment only those classes that have less than 100 images
 for valClass in trainClasses:
     matching_rows = trainInfo[trainInfo['class'] == valClass]
