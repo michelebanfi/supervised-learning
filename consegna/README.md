@@ -2,6 +2,8 @@
 
 ## Structure of the project
 
+> ``pip install -r requirements.txt``
+
 Inside the `notebook.ipynb` file the code used to train test and validate the networks.
 
 In order to properly create the Dataset a preprocessing step is needed. Inside

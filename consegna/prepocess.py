@@ -16,11 +16,11 @@ def add_string(file, string):
     if data.startswith(string): return
     with open(file, 'w') as modified: modified.write(string + data)
 
-
+# add the correct columns names to the csv files
 add_string('Data/annot/train_info.csv', 'image,class\n')
 add_string('Data/annot/val_info.csv', 'image,class\n')
 
-# directory:
+# directories
 trainDirectory = 'Data/train_set'
 testDirectory = 'Data/val_set'
 
@@ -28,7 +28,7 @@ processedTrainDirectory = 'Data/processedData/processed_train_set'
 processedTestDirectory = 'Data/processedData/processed_test_set'
 processedValDirectory = 'Data/processedData/processed_val_set'
 
-# creation of the directory if they dont exist
+# creation of the directories if they don't exist
 os.makedirs(processedTrainDirectory, exist_ok=True)
 os.makedirs(processedTestDirectory, exist_ok=True)
 os.makedirs(processedValDirectory, exist_ok=True)
@@ -83,11 +83,11 @@ def process_images(input_dir, output_dir, set_type):
 
 def valSet():
 
-    # take 25% of the train set and create a vaidation set
+    # take 25% of the training set and create a validation set
     image_path_pattern = os.path.join(trainDirectory, "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
-    # for the validation set, draw 25% of the train set. Being sure that at least one image of each class is in the validation set
+    # being sure that at least one image of each class is in the validation set
     val_set = []
     for trainClass in trainClasses:
         matching_rows = trainInfo[trainInfo['class'] == trainClass]
@@ -95,7 +95,7 @@ def valSet():
         image_path = os.path.join(trainDirectory, image)
         val_set.append(image_path)
 
-    # draw the rest of the images
+    # draw the rest of the images (25%)
     rand_choice = np.random.choice(image_paths, int(len(image_paths) * 0.25) - len(val_set), replace=False)
     val_set.extend(rand_choice)
 
@@ -128,7 +128,7 @@ print("Processing test set")
 process_images(testDirectory, processedTestDirectory, "test")
 
 # function to augment the data
-def augment_data(input_dir, output_dir, set_type, imageClass):
+def augment_data(input_dir, output_dir, imageClass):
     image_path_pattern = os.path.join(input_dir, str(imageClass), "*.jpg")
     image_paths = glob.glob(image_path_pattern)
 
@@ -159,13 +159,13 @@ def augment_data(input_dir, output_dir, set_type, imageClass):
         pbar.update(1)
 
 
-print("Augmenting train set")
+print("Augmenting training set")
 
 # augment only those classes that have less than 100 images
 for trainClass in trainClasses:
     matching_rows = trainInfo[trainInfo['class'] == trainClass]
     if len(matching_rows) < 100:
-        augment_data(processedTrainDirectory, processedTrainDirectory, "train", trainClass)
+        augment_data(processedTrainDirectory, processedTrainDirectory, trainClass)
 
 print("Augmenting test set")
 
@@ -173,14 +173,15 @@ print("Augmenting test set")
 for testClass in testClasses:
     matching_rows = testInfo[testInfo['class'] == testClass]
     if len(matching_rows) < 100:
-        augment_data(processedTestDirectory, processedTestDirectory, "test", testClass)
+        augment_data(processedTestDirectory, processedTestDirectory, testClass)
 
 print("Augmenting validation set")
 
-# augment only those classes that have less than 100 images
+# augment only those classes that have less than 100 images (based on the train classes, since the validation
+# set was created from the training set)
 for valClass in trainClasses:
     matching_rows = trainInfo[trainInfo['class'] == valClass]
     if len(matching_rows) < 100:
-        augment_data(processedValDirectory, processedValDirectory, "val", valClass)
+        augment_data(processedValDirectory, processedValDirectory, valClass)
 
 print("Done")
